@@ -62,6 +62,19 @@ namespace LifeGame_WinForms
             {
                 if (gameObjects[i] is Enemy)
                 {
+                    if ((gameObjects[i] as Enemy).targetPoint != null && IsIntersect((gameObjects[i] as Enemy).targetPoint, (gameObjects[i] as Enemy)))
+                    {
+                        var food = gameObjects.FirstOrDefault(x => x == (gameObjects[i] as Enemy).targetPoint);
+
+                        if (food != null)
+                        {
+                            food.IsAlive = false;
+                            gameObjects.Remove(food);
+                            var goFood = FindFood(food);
+                            pictureBox1.Controls.Remove(goFood);
+                        }
+                    }
+
                     (gameObjects[i] as Enemy).Move(gameObjects.Where(x => x is Food).ToList());
 
                     pictureBox1.Controls[i].Location = (gameObjects[i] as Enemy).Position;
@@ -70,24 +83,29 @@ namespace LifeGame_WinForms
             }
         }
 
-        private void EatFood()
+        private bool IsIntersect(GameObject go1, GameObject go2)
         {
-            for (int i = 0; i < gameObjects.Count; i++)
-            {
-                if (gameObjects[i] is Food)
-                {
-                    if ((gameObjects[i] as Food).Eat(gameObjects.Where(x => x is Enemy).ToList()))
-                    {
-                        var x = rnd.Next(770);
-                        var y = rnd.Next(370);
-                        pictureBox1.Controls[i].Location = new Point(x, y);
-                        pictureBox1.Update();
-                    }
-                }
+            var x1 = go1.Position.X + go1.Size.Width;
+            var y1 = go1.Position.Y + go1.Size.Height;
 
-            }
+            var x2 = go2.Position.X + go2.Size.Height;
+            var y2 = go2.Position.Y + go2.Size.Height;
+
+            return !(go1.Position.X > x2 || go1.Position.Y > y2 || x1 < go2.Position.X || y1 < go2.Position.Y);
         }
 
+        private PictureBox FindFood(GameObject food)
+        {
+            foreach(PictureBox control in pictureBox1.Controls)
+            {
+                if (control.BackColor == food.Color.Color && control.Location == food.Position)
+                {
+                    return control;
+                }
+            }
+
+            return null;
+        }
 
         private void Start_btn_Click(object sender, EventArgs e)
         {

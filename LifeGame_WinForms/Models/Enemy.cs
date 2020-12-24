@@ -13,7 +13,7 @@ namespace LifeGame_WinForms.Models
         public Enemy(int maxX, int maxY, SolidBrush color, string type, int count) 
             : base(maxX, maxY, color, type, count) {   }
 
-        private GameObject targetPoint = null;
+        public GameObject targetPoint = null;
         int speed = 1;
 
         private void FindClosest(List<GameObject> points)
